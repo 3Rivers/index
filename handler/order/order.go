@@ -1,29 +1,29 @@
-package handler
+package order
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"net/http"
 	"time"
 
 	"github.com/micro/go-micro/v2/client"
-	index "github.com/3Rivers/helloworld/proto/helloworld"
+	order "github.com/3Rivers/order/proto/order"
 )
 
-func IndexCall(w http.ResponseWriter, r *http.Request) {
+func OrderCall(w http.ResponseWriter, r *http.Request) {
 	// decode the incoming request as json
 	var request map[string]interface{}
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	fmt.Println("new")
 	// call the backend service
-	indexClient := index.NewHelloworldService("go.micro.service.helloworld", client.DefaultClient)
-	rsp, err := indexClient.Call(context.TODO(), &index.Request{
-		Name: request["name"].(string),
+	orderClient := order.NewOrderService("go.micro.service.order", client.DefaultClient)
+	rsp, err := orderClient.Call(context.TODO(), &order.Request{
+		Id: request["id"].(int64),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -32,7 +32,8 @@ func IndexCall(w http.ResponseWriter, r *http.Request) {
 
 	// we want to augment the response
 	response := map[string]interface{}{
-		"msg": rsp.Msg,
+		"username": rsp.User,
+		"goods": rsp.Goods,
 		"ref": time.Now().UnixNano(),
 	}
 

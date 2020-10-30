@@ -1,14 +1,15 @@
 package main
 
 import (
+        "github.com/3Rivers/index/handler/order"
         log "github.com/micro/go-micro/v2/logger"
-	      "net/http"
+        "net/http"
 
         "github.com/micro/go-micro/v2/registry"
         "github.com/micro/go-micro/v2/registry/etcd"
 
-        "github.com/micro/go-micro/v2/web"
         "github.com/3Rivers/index/handler"
+        "github.com/micro/go-micro/v2/web"
 )
 
 var etcdReg registry.Registry
@@ -37,10 +38,12 @@ func main() {
 	service.Handle("/", http.FileServer(http.Dir("html")))
 
 	// register call handler
-	service.HandleFunc("/index/call", handler.IndexCall)
+	service.HandleFunc("/hello", handler.IndexCall)
+    service.HandleFunc("/order", order.OrderCall)
+
 
 	// run service
-        if err := service.Run(); err != nil {
-                log.Fatal(err)
-        }
+	if err := service.Run(); err != nil {
+	        log.Fatal(err)
+	}
 }

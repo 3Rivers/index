@@ -8,5 +8,6 @@ replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 
 require (
 	github.com/3Rivers/helloworld v0.0.0-20201030054725-78344f9d694f
+	github.com/3Rivers/order v0.0.0-20201030085137-7ece0048b1e7
 	github.com/micro/go-micro/v2 v2.9.1
 )
