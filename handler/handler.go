@@ -19,7 +19,7 @@ func IndexCall(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// call the backend service
-	indexClient := index.NewIndexService("go.micro.service.index", client.DefaultClient)
+	indexClient := index.NewHelloworldService("go.micro.service.index", client.DefaultClient)
 	rsp, err := indexClient.Call(context.TODO(), &index.Request{
 		Name: request["name"].(string),
 	})

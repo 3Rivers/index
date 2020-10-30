@@ -3,6 +3,10 @@ package main
 import (
         log "github.com/micro/go-micro/v2/logger"
 	      "net/http"
+
+        "github.com/micro/go-micro/v2/registry"
+        "github.com/micro/go-micro/v2/registry/etcd"
+
         "github.com/micro/go-micro/v2/web"
         "github.com/3Rivers/index/handler"
 )
