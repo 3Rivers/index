@@ -4,12 +4,26 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/registry"
+	"github.com/micro/go-micro/v2/registry/etcd"
+	"github.com/micro/go-plugins/wrapper/breaker/hystrix/v2"
 	"net/http"
 	"time"
 
-	"github.com/micro/go-micro/v2/client"
+	hystrixGo "github.com/afex/hystrix-go/hystrix"
+
 	index "github.com/3Rivers/helloworld/proto/helloworld"
 )
+
+var etcdReg registry.Registry
+
+func  init()  {
+	//新建一个consul注册的地址，也就是我们consul服务启动的机器ip+端口
+	etcdReg = etcd.NewRegistry(
+		registry.Addrs("192.168.2.254:12379", "192.168.2.254:22379", "192.168.2.254:32379"),
+	)
+}
 
 func IndexCall(w http.ResponseWriter, r *http.Request) {
 	// decode the incoming request as json
@@ -20,8 +34,22 @@ func IndexCall(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("new")
+
+	app := micro.NewService(
+		micro.Name("go.micro.client.helloworld"),
+		micro.Registry(etcdReg),
+		micro.WrapClient(
+			// 引入hystrix包装器
+			hystrix.NewClientWrapper(),
+		),
+	)
 	// call the backend service
-	indexClient := index.NewHelloworldService("go.micro.service.helloworld", client.DefaultClient)
+	indexClient := index.NewHelloworldService("go.micro.service.helloworld", app.Client())
+	hystrixGo.ConfigureCommand("go.micro.service.helloworld",
+		hystrixGo.CommandConfig{
+			MaxConcurrentRequests: 50, //最大并发数
+			Timeout:               1000,//超时时间
+		})
 	rsp, err := indexClient.Call(context.TODO(), &index.Request{
 		Name: request["name"].(string),
 	})

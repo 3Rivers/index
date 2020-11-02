@@ -1,15 +1,16 @@
 package main
 
 import (
-        "github.com/3Rivers/index/handler/order"
-        log "github.com/micro/go-micro/v2/logger"
-        "net/http"
+	"github.com/3Rivers/index/handler/order"
+	log "github.com/micro/go-micro/v2/logger"
+	"net/http"
+	"time"
 
-        "github.com/micro/go-micro/v2/registry"
-        "github.com/micro/go-micro/v2/registry/etcd"
+	"github.com/micro/go-micro/v2/registry"
+	"github.com/micro/go-micro/v2/registry/etcd"
 
-        "github.com/3Rivers/index/handler"
-        "github.com/micro/go-micro/v2/web"
+	"github.com/3Rivers/index/handler"
+	"github.com/micro/go-micro/v2/web"
 )
 
 var etcdReg registry.Registry
@@ -27,6 +28,8 @@ func main() {
                 web.Name("go.micro.web.index"),
                 web.Version("latest"),
                 web.Registry(etcdReg),
+                web.RegisterTTL(time.Second * 30),
+                web.RegisterInterval(time.Second * 3),
         )
 
 	// initialise service
