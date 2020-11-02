@@ -23,7 +23,7 @@ func OrderCall(w http.ResponseWriter, r *http.Request) {
 	// call the backend service
 	orderClient := order.NewOrderService("go.micro.service.order", client.DefaultClient)
 	rsp, err := orderClient.Call(context.TODO(), &order.Request{
-		Id: request["id"].(int64),
+		Id: int64(request["id"].(float64)),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
