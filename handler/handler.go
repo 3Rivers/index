@@ -33,7 +33,7 @@ func IndexCall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("new")
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 
 	app := micro.NewService(
 		micro.Name("go.micro.client.helloworld"),
@@ -43,12 +43,14 @@ func IndexCall(w http.ResponseWriter, r *http.Request) {
 			hystrix.NewClientWrapper(),
 		),
 	)
+	hystrixGo.DefaultMaxConcurrent = 3//change concurrrent to 3
+	hystrixGo.DefaultTimeout = 200 //change timeout to 200 milliseconds...
 	// call the backend service
 	indexClient := index.NewHelloworldService("go.micro.service.helloworld", app.Client())
-	hystrixGo.ConfigureCommand("go.micro.service.helloworld",
+	hystrixGo.ConfigureCommand("go.micro.service.helloworld.Helloworld.Call",
 		hystrixGo.CommandConfig{
 			MaxConcurrentRequests: 50, //最大并发数
-			Timeout:               1000,//超时时间
+			Timeout:               4000,//超时时间
 		})
 	rsp, err := indexClient.Call(context.TODO(), &index.Request{
 		Name: request["name"].(string),
